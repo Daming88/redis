@@ -161,14 +161,12 @@ Dict的rehash并不是一次性完成的。如果Dict中包含了数百万的ent
 
 ##### Dict的结构  
 
----
 1、类似Java的HashTable，底层是数组+链表来解决哈希冲突。  
 2、Dict包含两个哈希表，ht[0]常用，ht[1]用来rehash  
 ---
 
 #### Dict的伸缩
 
----
 1、当LoadFactor大于5或者LoadFactor大于1并且没子进程任务时，Dict扩容
 2、当LoadFactor小于0.1时，Dict收缩
 3、扩容大小为第一个大于等于used+1的2的n次方
