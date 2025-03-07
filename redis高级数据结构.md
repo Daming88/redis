@@ -110,9 +110,10 @@ Dict在每次新增键值对时都会检查负载因子(LoadFactor=used/size),�
 > Dict除了扩容以外，每次删除元素时，也会对负载因子做检查，当LoadFactor<0.1时，会做哈希表收缩:
 ![img/img_11.png](img/img_11.png)
 ### Dict的rehash
-> Dict在扩容和收缩时，必定会创建新的哈希表，导致哈希表的size和sizemask变化，而key的查询与sizemask有关。
-> 因此必须对哈希表中的每一个key重新计算索引，插入新的哈希表，这个过程称为rehash。过程如下：
----
+
+Dict在扩容和收缩时，必定会创建新的哈希表，导致哈希表的size和sizemask变化，而key的查询与sizemask有关。
+
+因此必须对哈希表中的每一个key重新计算索引，插入新的哈希表，这个过程称为rehash。过程如下：  
 1、计算新hash表的realeSize，值取决于当前要做的是扩容还是收缩:  
 &emsp;&emsp;如果是扩容，则新size为第一个大于等于dict.ht[0].used+1的第一个2的n次方  
 &emsp;&emsp;如果是收缩，则新size为第一个大于等于dict.ht[0].used的第一个2的n次方(不得小于4)  
@@ -142,10 +143,9 @@ Dict在每次新增键值对时都会检查负载因子(LoadFactor=used/size),�
 
 ![img/img_16.png](img/img_16.png)
 
-----
 Dict的rehash并不是一次性完成的。如果Dict中包含了数百万的entry(元素),要在一次rehash完成，极有可能导致主线程阻塞。  
 因此Dict的rehash是分多次、渐进式的完成的，因此称为渐进式rehash。流程如下：  
-----
+
 1、计算新hash表的size，值取决于当前要做的是扩容还是收缩:  
 &emsp;&emsp;如果是扩容，则新size为第一个大于等于dict.ht[0].used+1的第一个2的n次方  
 &emsp;&emsp;如果是收缩，则新size为第一个大于等于dict.ht[0].used的第一个2的n次方(不得小于4)    
