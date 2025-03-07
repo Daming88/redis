@@ -34,7 +34,8 @@ typedef struct intset {
     int8_t contents[];  // 整数数组，保存集合数据
 } intset;
 ```
-其中的encoding包含三种模式，表示存储的整数大小不同：  
+其中的encoding包含三种模式，表示存储的整数大小不同：
+
 ```text
 #define INTSET_ENC_INT16 (sizeof(int16_t))  // 2字节整数，范围类似java的short类型
 #define INTSET_ENC_INT32 (sizeof(int32_t))  // 4字节整数，范围类似java的int类型
@@ -43,6 +44,7 @@ typedef struct intset {
 
 为了方便查找，Redis会将intset中所有的整数按照升序依次保存在contents数组中，结构图如下：
 ![img/img.png](img/img.png)
+
 现在数组中每个数字都在int16_t的范围内，因此采用的编码方式是INTSET_ENC_INT16。，每部分占用的字节大小为：  
 encoding：4字节  
 length：4字节  
