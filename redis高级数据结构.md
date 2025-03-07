@@ -71,21 +71,20 @@ IntSet升级
 
 4、最后，将intset的encoding属性改为INTSET_ENC_INT32，将length属性改为4
 
-![img/img_4.png](img/img_4.png)
+![img/img_4.png](img/img_4.png)  
 
----
 Intset可以看做是特殊的整数数组，具备一些特点：   
 1、Redis会确保Intset中的元素唯一、有序。  
 2、具备类型升级机制，可以节省内存空间。  
 3、底层采用二分查找方式来查询。  
 4、适合数据量比较少的情况下使用。   
----
+
 Redis的Intset(整数集合)是专门为set集合数据类型设计的一种底层数据结构，用于在特定条件下优化内存和性能：  
 1、所有元素都是整数(int64_t范围内的值)  
 2、元素数量少(默认阈值：set-max-intset-entries,默认值是512，可配置)  
 <font color="red">如果上述任一条件都不满足，Redis会自动将Intset升级为Hash表(Dict)结构存储。</font>    
 详细源码可参考[Redis源码解析之IntSet](src/intset.h)
-你家
+
 ### Dict基本结构    
 > 我们知道Redis是一个键值型(Key-Value Pair)的数据库，我们可以根据键实现快速的增删改查。而键与值的映射关系正是通过Dict实现的。
 ---
