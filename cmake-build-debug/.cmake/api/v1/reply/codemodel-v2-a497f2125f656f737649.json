@@ -211,7 +211,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "redis-server::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-redis-server-Debug-d5365a7ae96690b00fd5.json",
+					"jsonFile" : "target-redis-server-Debug-ac0a67421b0e9a6bfcd4.json",
 					"name" : "redis-server",
 					"projectIndex" : 0
 				}

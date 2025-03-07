@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "D:/\u9879\u76ee/redis/src/redis-server.exe"
+			"path" : "/cygdrive/d/\u9879\u76ee/redis/src/redis-server.exe"
 		},
 		{
-			"path" : "D:/\u9879\u76ee/redis/src/redis-server.pdb"
+			"path" : "/cygdrive/d/\u9879\u76ee/redis/src/redis-server.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -73,15 +73,15 @@
 			[
 				{
 					"backtrace" : 4,
-					"path" : "D:/\u9879\u76ee/redis/deps/hiredis"
+					"path" : "/cygdrive/d/\u9879\u76ee/redis/deps/hiredis"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "D:/\u9879\u76ee/redis/deps/linenoise"
+					"path" : "/cygdrive/d/\u9879\u76ee/redis/deps/linenoise"
 				},
 				{
 					"backtrace" : 4,
-					"path" : "D:/\u9879\u76ee/redis/deps/lua/src"
+					"path" : "/cygdrive/d/\u9879\u76ee/redis/deps/lua/src"
 				}
 			],
 			"language" : "C",
@@ -205,7 +205,7 @@
 		],
 		"prefix" : 
 		{
-			"path" : "C:/Program Files (x86)/redis"
+			"path" : "/usr/local"
 		}
 	},
 	"link" : 
@@ -217,7 +217,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "",
+				"fragment" : "-Wl,--enable-auto-import",
 				"role" : "flags"
 			},
 			{
@@ -232,21 +232,17 @@
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "deps\\lua\\liblua.a",
+				"fragment" : "deps/lua/liblua.a",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "deps\\linenoise\\liblinenoise.a",
+				"fragment" : "deps/linenoise/liblinenoise.a",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "deps\\hiredis\\libhiredis.dll.a",
-				"role" : "libraries"
-			},
-			{
-				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
+				"fragment" : "deps/hiredis/libhiredis.dll.a",
 				"role" : "libraries"
 			}
 		],

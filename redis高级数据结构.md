@@ -252,3 +252,12 @@ Redis在3.2版本后引入了新的数据结构QuickList，他是一个双端链
 默认值是-2  
 可在redis客户端输入一下命令查看：config get list-max-ziplist-size  
 ![img/img_29.png](img/img_29.png)
+
+除了控制ZipList的大小，QuickList还可以对节点的ZipList做压缩。通过配置项list-compress-deepth控制压缩深度。  
+因为链表一般都是从首尾访问较多，所以首尾是不压缩的。这个参数是控制首尾不压缩的节点个数：  
+0：特殊值，代表不压缩  
+1：标示QuickList的首尾各有1个节点不压缩，中间节点压缩    
+2：标示QuickList的首尾各有2个节点不压缩，中间节点压缩    
+以此类推  
+默认值是0，可用config get list-compress-depth命令查看  
+![img.png](img/img_30.png)

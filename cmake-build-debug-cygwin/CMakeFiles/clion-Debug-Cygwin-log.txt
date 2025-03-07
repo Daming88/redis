@@ -1,0 +1,29 @@
+C:\Users\li\AppData\Local\JetBrains\CLion2024.3\cygwin_cmake\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=/cygdrive/d/app/CLion 2024.3.4/bin/ninja/cygwin/x64/ninja.exe" -G Ninja -S /cygdrive/d/项目/redis -B /cygdrive/d/项目/redis/cmake-build-debug-cygwin
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMAKE_RUNTIME_OUTPUT_DIRECTORYis:/cygdrive/d/项目/redis/cmake-build-debug-cygwin/../src
+-- No build type defined; defaulting to 'Debug'
+-- Host is: CYGWIN-3.5.7-1.x86_64. Build target is:
+CYGWIN-3.5.7-1.x86_64
+-- Project root directory is: /cygdrive/d/项目/redis
+-- Generating release.h...
+#define REDIS_GIT_SHA1 "73e8ea16"
+#define REDIS_GIT_DIRTY "3473"
+CMake Deprecation Warning at deps/hiredis/CMakeLists.txt:1 (CMAKE_MINIMUM_REQUIRED):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+Detected version: 0.14.0
+-- Configuring done (0.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: /cygdrive/d/项目/redis/cmake-build-debug-cygwin

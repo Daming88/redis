@@ -1,0 +1,5 @@
+ToolSet: 3.5.7 (local)@D:\app\cygwin64
+Ninja: null@D:\app\CLion 2024.3.4\bin\ninja\cygwin\x64\ninja.exe
+Options: 
+
+Options:-DCMAKE_MAKE_PROGRAM=/cygdrive/d/app/CLion 2024.3.4/bin/ninja/cygwin/x64/ninja.exe
