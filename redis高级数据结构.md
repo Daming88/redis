@@ -42,7 +42,7 @@ typedef struct intset {
 ```
 ---
 为了方便查找，Redis会将intset中所有的整数按照升序依次保存在contents数组中，结构图如下：
-![img.png](img.png)
+![img/img.png](img/img.png)
 现在数组中每个数字都在int16_t的范围内，因此采用的编码方式是INTSET_ENC_INT16。，每部分占用的字节大小为：  
 encoding：4字节  
 length：4字节  
@@ -50,16 +50,16 @@ contents：2字节*3=6字节。
 ---
 IntSet升级  
 现在，假设有一个intset，元素为{5，10，20}，采用的是INTSET_ENC_INT16,则每个整数占2字节:
-![img_1.png](img_1.png)
+![img/img_1.png](img/img_1.png)
 我们向其中添加一个数字：50000，这个数字超出了int16_t的范围，intset会自动升级编码方式到合适的大小。
 以当前案例来说，流程如下：  
 1、升级编码为INTSET_ENC_INT32,每个整数占4个字节，并按照新的编码方式以及元素个数扩容数组。  
 2、倒叙依次将数组中的元素拷贝到扩容后的正确位置
-![img_2.png](img_2.png)
+![img/img_2.png](img/img_2.png)
 3、将待添加元素放入数组末尾
-![img_3.png](img_3.png)
+![img/img_3.png](img/img_3.png)
 4、最后，将intset的encoding属性改为INTSET_ENC_INT32，将length属性改为4
-![img_4.png](img_4.png)
+![img/img_4.png](img/img_4.png)
 ---
 Intset可以看做是特殊的整数数组，具备一些特点：   
 1、Redis会确保Intset中的元素唯一、有序。  
@@ -77,26 +77,26 @@ Redis的Intset(整数集合)是专门为set集合数据类型设计的一种底�
 > 我们知道Redis是一个键值型(Key-Value Pair)的数据库，我们可以根据键实现快速的增删改查。而键与值的映射关系正是通过Dict实现的。
 ---
 Dict由三部分组成：哈希表(DictHashTable)、哈希节点(DictEntry)、字典(Dict)
-![img_8.png](img_8.png)
-![img_9.png](img_9.png)
+![img/img_8.png](img/img_8.png)
+![img/img_9.png](img/img_9.png)
 当我们向Dict添加键值对时，Redis首先根据Key计算出Hash值(h)，然后利用 h&sizemask 来计算应该存储到数组中的哪个索引位置。  
 例如我们存储k1=v1，假设k1的哈希值h=1，则1&3=1，因此k1=v1要存储到数组角标1的位置。
-![img_6.png](img_6.png)
+![img/img_6.png](img/img_6.png)
 
 如果我们继续存储k2=v2，假设k2的哈希值和key1相等时，则会在v1的位置指向k2，然后key2中的 *next 指向key1，形成了这么一个链表的结构。
 
-![img_7.png](img_7.png)
+![img/img_7.png](img/img_7.png)
 ### Dict扩容
 > Dict中的HashTable就是数组结合单向链表实现的，当集合中元素较多时，必然导致哈希冲突增多，链表过长，则查询效率会大大降低。
 ---
 Dict在每次新增键值对时都会检查负载因子(LoadFactor=used/size),满足以下两种情况时会触发哈希表扩容：  
 1、LoadFactor>=1,并且服务器没有执行BGSAVE或者BGREWRITEAOF等后台进程;
 2、LoadFactor>5；
-![img_10.png](img_10.png)
+![img/img_10.png](img/img_10.png)
 [Reis中hash表扩容源码](src/dict.c)中的dictExpandIfNeeded(dict *d)方法
 ### Dict收缩
 > Dict除了扩容以外，每次删除元素时，也会对负载因子做检查，当LoadFactor<0.1时，会做哈希表收缩:
-![img_11.png](img_11.png)
+![img/img_11.png](img/img_11.png)
 ### Dict的rehash
 > Dict在扩容和收缩时，必定会创建新的哈希表，导致哈希表的size和sizemask变化，而key的查询与sizemask有关。
 > 因此必须对哈希表中的每一个key重新计算索引，插入新的哈希表，这个过程称为rehash。过程如下：
@@ -112,23 +112,23 @@ Dict在每次新增键值对时都会检查负载因子(LoadFactor=used/size),�
 通过一下流程图可只管的看到rehash的演变过程：  
 1、初始时
 
-![img_12.png](img_12.png)
+![img/img_12.png](img/img_12.png)
 
 2、当插入key5时，便会触发扩容，新size为第一个大于等于dict.ht[0].used+1的第一2的n次方，即使比5+1=6大的第一个2的n次方为8，按照新的realeSize申请内存空间，创建dictht，并赋值给dict.ht[1]
 
-![img_13.png](img_13.png)
+![img/img_13.png](img/img_13.png)
 
 3、当为ht[1]分配完内存后，设置rehashids=0，标示开始rehash
 
-![img_14.png](img_14.png)
+![img/img_14.png](img/img_14.png)
 
 4、将ht[0]中的每一个dictEntry都指向到ht[1]，ht[1]的dictEntry重新指向null
 
-![img_15.png](img_15.png)
+![img/img_15.png](img/img_15.png)
 
 5、最后把dict的rehashids设置为-1和更新ht[0]和ht[1]的size、sizemask、used的值表示rehash过程结束
 
-![img_16.png](img_16.png)
+![img/img_16.png](img/img_16.png)
 
 ----
 Dict的rehash并不是一次性完成的。如果Dict中包含了数百万的entry(元素),要在一次rehash完成，极有可能导致主线程阻塞。  
@@ -159,7 +159,7 @@ Dict的rehash并不是一次性完成的。如果Dict中包含了数百万的ent
 
 ### ZipList
 > ZipList是一个压缩列表，是一种特殊的"双端链表"，由一系列特殊编码的连续内存块组成。可以在任意一端进行压入/弹出操作，并且该操作的时间复杂度为O(1).
-![img_18.png](img_18.png)
+![img/img_18.png](img/img_18.png)
 ---
 zlbytes：uint32_t 类型，长度4个字节，记录整个压缩列表占用的内存字节  
 zltail：uint32_t 类型，长度4个字节，记录压缩列表表尾节点距离压缩列表的起始地址有多少个字节，通过偏移量，可以确定表尾节点的地址  
@@ -169,7 +169,7 @@ zlend：uint8_t 类型，长度1个字节，记录压缩列表的结束标志，
 
 ---
 ZipList中的Entry并不像普通链表那样记录前后节点的指针，因为记录两个指针要占用16个字节，浪费内存。而是采用了下面的结构：
-![img_19.png](img_19.png)
+![img/img_19.png](img/img_19.png)
 
 previous_entry_length：前一节点的长度，占1个字节或者5个字节。  
 &emsp;&emsp;如果前一节点的长度小于254字节，则采用1个字节来保存这个长度值。  
@@ -182,15 +182,15 @@ contents：负责保存节点的数据，可以字符串或整数。
 ZipListEntry中的encoding编码分为字符串和整数两种：  
 1、字符串：如果encoding是以"00"、"01"、"10"开头，则证明content是字符串
 
-![img_20.png](img_20.png)
+![img/img_20.png](img/img_20.png)
 例如：我们要保存字符串："ab"和"bc“
-![img_22.png](img_22.png)
+![img/img_22.png](img/img_22.png)
 
 2、数字：如果encoding是以"11"开始，则证明content是整数，且encoding固定只占用1个字节  
-![img_23.png](img_23.png)
+![img/img_23.png](img/img_23.png)
 
 例如: 一个ZipList中包含两个整数值："2"和"5"
-![img_24.png](img_24.png)
+![img/img_24.png](img/img_24.png)
 
 #### ZipList的连锁更新问题  
 ZipList的每个Entry都包含previous_entry_length来记录上一个节点的大小，长度是1个或5个字节：  
@@ -199,9 +199,9 @@ ZipList的每个Entry都包含previous_entry_length来记录上一个节点的�
 
 现在，假设我们由N个连续的、长度为250~253字节之间的entry，因此entry的previous_entry_length属性用1个字节即可表示，如图所示：  
 
-![img_26.png](img_26.png)
+![img/img_26.png](img/img_26.png)
 如果此时，在队首增加一个254或254以上字节的entry，这时下一个previous_entry_length使用一个字节就表示不了254，要变成使用5给字节来表示254，同样继续下一个entry因为上一个entry的字节数超出了254，previous_entry_length也需要转变成5个字节从而导致entry的整体字节数超过253，以此类推到最后一个字节。
-![img_27.png](img_27.png)
+![img/img_27.png](img/img_27.png)
 
 <font color="blue">ZipList这种特殊情况下产生的连续多次空间扩展操作称之为连锁更新(Cascade Update)。新增、删除都可能导致连锁更新的发生</font>
 
@@ -223,7 +223,7 @@ ZipList特性：
 我们可以创建多个ZipList来分片存储数据。   
 问题3：数据拆分后比较分散，不方便管理和查找，这多个ZipList如何建立联系？     
 Redis在3.2版本后引入了新的数据结构QuickList，他是一个双端链表，只不过链表中的每个节点都是一个ZipList。
-![img_28.png](img_28.png)
+![img/img_28.png](img/img_28.png)
 
 ---
 为了避免QuickList中的每个ZipList中entry过多，Redis提供了一个配置项: list-mas-ziplist-size来限制。  
@@ -236,4 +236,4 @@ Redis在3.2版本后引入了新的数据结构QuickList，他是一个双端链
 &emsp;&emsp;&emsp;&emsp;-5:每个ZipList的内存占用不能超过64kb  
 默认值是-2  
 可在redis客户端输入一下命令查看：config get list-max-ziplist-size  
-![img_29.png](img_29.png)
+![img/img_29.png](img/img_29.png)
