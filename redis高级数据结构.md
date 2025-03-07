@@ -109,8 +109,9 @@ Dict在每次新增键值对时都会检查负载因子(LoadFactor=used/size),�
 ### Dict收缩
 > Dict除了扩容以外，每次删除元素时，也会对负载因子做检查，当LoadFactor<0.1时，会做哈希表收缩:
 ![img/img_11.png](img/img_11.png)
-### Dict的rehash
 
+### Dict的rehash
+---
 Dict在扩容和收缩时，必定会创建新的哈希表，导致哈希表的size和sizemask变化，而key的查询与sizemask有关。
 
 因此必须对哈希表中的每一个key重新计算索引，插入新的哈希表，这个过程称为rehash。过程如下：  
@@ -120,8 +121,8 @@ Dict在扩容和收缩时，必定会创建新的哈希表，导致哈希表的s
 2、按照新的realeSize申请内存空间，创建dictht，并赋值给dict.ht[1]  
 3、设置dict.rehashids=0，标示开始rehash  
 4、将dict.ht[0]中的每一个dictEntry都rehash到dict.ht[1]  
-5、将dict.ht[1]赋值给dict.ht[0],给dict.ht[1]初始化为空哈希表，释放原来的dict.ht[0]的内存  
----
+5、将dict.ht[1]赋值给dict.ht[0],给dict.ht[1]初始化为空哈希表，释放原来的dict.ht[0]的内存
+
 通过一下流程图可只管的看到rehash的演变过程：  
 1、初始时
 
