@@ -73,6 +73,7 @@ IntSet升级
 
 ![img/img_4.png](img/img_4.png)
 
+---
 Intset可以看做是特殊的整数数组，具备一些特点：   
 1、Redis会确保Intset中的元素唯一、有序。  
 2、具备类型升级机制，可以节省内存空间。  
