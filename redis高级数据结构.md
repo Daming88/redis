@@ -157,13 +157,11 @@ Dict的rehash并不是一次性完成的。如果Dict中包含了数百万的ent
 5、将dict.ht[1]赋值给dict.ht[0],给dict.ht[1]初始化为空哈希表，释放原来的dict.ht[0]的内存  
 6、将rehashidx赋值为-1，代表rehash结束。  
 7、在rehash过程中，新增操作，直接写入ht[1]，查询、修改和删除则会在dict.ht[0]和dict.[1]依次查找并执行。这样可以确保ht[0]的数据只减不增，随着rehash最终为空
----
 
 ##### Dict的结构  
 
 1、类似Java的HashTable，底层是数组+链表来解决哈希冲突。  
-2、Dict包含两个哈希表，ht[0]常用，ht[1]用来rehash  
----
+2、Dict包含两个哈希表，ht[0]常用，ht[1]用来rehash
 
 #### Dict的伸缩
 
@@ -173,7 +171,6 @@ Dict的rehash并不是一次性完成的。如果Dict中包含了数百万的ent
 4、收缩大小为第一个大于等于used的2的n次方，不得小于4
 5、Dict采用渐进式rehash，每次访问Dict时执行依次rehash
 6、rehahs时ht[0]只减不增，新增操作只在ht[1]执行，其他操作在两个哈希表
----
 
 ### ZipList
 > ZipList是一个压缩列表，是一种特殊的"双端链表"，由一系列特殊编码的连续内存块组成。可以在任意一端进行压入/弹出操作，并且该操作的时间复杂度为O(1).
