@@ -91,6 +91,7 @@ Redis的Intset(整数集合)是专门为set集合数据类型设计的一种底�
 Dict由三部分组成：哈希表(DictHashTable)、哈希节点(DictEntry)、字典(Dict)
 ![img/img_8.png](img/img_8.png)
 ![img/img_9.png](img/img_9.png)
+
 当我们向Dict添加键值对时，Redis首先根据Key计算出Hash值(h)，然后利用 h&sizemask 来计算应该存储到数组中的哪个索引位置。  
 例如我们存储k1=v1，假设k1的哈希值h=1，则1&3=1，因此k1=v1要存储到数组角标1的位置。
 ![img/img_6.png](img/img_6.png)
@@ -102,8 +103,8 @@ Dict由三部分组成：哈希表(DictHashTable)、哈希节点(DictEntry)、�
 > Dict中的HashTable就是数组结合单向链表实现的，当集合中元素较多时，必然导致哈希冲突增多，链表过长，则查询效率会大大降低。
 ---
 Dict在每次新增键值对时都会检查负载因子(LoadFactor=used/size),满足以下两种情况时会触发哈希表扩容：  
-1、LoadFactor>=1,并且服务器没有执行BGSAVE或者BGREWRITEAOF等后台进程;
-2、LoadFactor>5；
+1、LoadFactor>=1,并且服务器没有执行BGSAVE或者BGREWRITEAOF等后台进程;  
+2、LoadFactor>5；  
 ![img/img_10.png](img/img_10.png)
 [Reis中hash表扩容源码](src/dict.c)中的dictExpandIfNeeded(dict *d)方法
 ### Dict收缩
@@ -165,12 +166,12 @@ Dict的rehash并不是一次性完成的。如果Dict中包含了数百万的ent
 
 #### Dict的伸缩
 
-1、当LoadFactor大于5或者LoadFactor大于1并且没子进程任务时，Dict扩容
-2、当LoadFactor小于0.1时，Dict收缩
-3、扩容大小为第一个大于等于used+1的2的n次方
-4、收缩大小为第一个大于等于used的2的n次方，不得小于4
-5、Dict采用渐进式rehash，每次访问Dict时执行依次rehash
-6、rehahs时ht[0]只减不增，新增操作只在ht[1]执行，其他操作在两个哈希表
+1、当LoadFactor大于5或者LoadFactor大于1并且没子进程任务时，Dict扩容  
+2、当LoadFactor小于0.1时，Dict收缩  
+3、扩容大小为第一个大于等于used+1的2的n次方  
+4、收缩大小为第一个大于等于used的2的n次方，不得小于4  
+5、Dict采用渐进式rehash，每次访问Dict时执行依次rehash  
+6、rehahs时ht[0]只减不增，新增操作只在ht[1]执行，其他操作在两个哈希表  
 
 ### ZipList
 > ZipList是一个压缩列表，是一种特殊的"双端链表"，由一系列特殊编码的连续内存块组成。可以在任意一端进行压入/弹出操作，并且该操作的时间复杂度为O(1).
@@ -208,11 +209,12 @@ ZipListEntry中的encoding编码分为字符串和整数两种：
 ![img/img_24.png](img/img_24.png)
 
 #### ZipList的连锁更新问题  
-ZipList的每个Entry都包含previous_entry_length来记录上一个节点的大小，长度是1个或5个字节：  
-1、如果前一节点的长度小于254字节，则采用1个字节来保存这个长度值。  
-2、如果钱一节点的长度大于等于254字节，则采用5个字节来保存这个长度，第一个字节为0xfe,后四个字节才是真实长度数据。
 
-现在，假设我们由N个连续的、长度为250~253字节之间的entry，因此entry的previous_entry_length属性用1个字节即可表示，如图所示：  
+ZipList的每个Entry都包含previous_entry_length来记录上一个节点的大小，长度是1个或5个字节：     
+1、如果前一节点的长度小于254字节，则采用1个字节来保存这个长度值。    
+2、如果钱一节点的长度大于等于254字节，则采用5个字节来保存这个长度，第一个字节为0xfe,后四个字节才是真实长度数据。    
+
+现在，假设我们由N个连续的、长度为250~253字节之间的entry，因此entry的previous_entry_length属性用1个字节即可表示，如图所示：    
 
 ![img/img_26.png](img/img_26.png)
 如果此时，在队首增加一个254或254以上字节的entry，这时下一个previous_entry_length使用一个字节就表示不了254，要变成使用5给字节来表示254，同样继续下一个entry因为上一个entry的字节数超出了254，previous_entry_length也需要转变成5个字节从而导致entry的整体字节数超过253，以此类推到最后一个字节。
@@ -261,3 +263,55 @@ Redis在3.2版本后引入了新的数据结构QuickList，他是一个双端链
 以此类推  
 默认值是0，可用config get list-compress-depth命令查看  
 ![img.png](img/img_30.png)
+
+---
+QuickList和QuickListNode的结构源码图片如下：  
+
+![img/img_31.png](img/img_31.png)
+
+[可以通过连接直接转到QuickList源码](src/quicklist.h)    
+一下是一个QuickList的内存结构图：  
+
+![img/img_32.png](img/img_32.png)  
+---
+QuickList的特点：  
+1、QuickList是一个双端链表，每个节点都是一个ZipList。  
+2、节点采用ZipList,解决传统连续内存的占用问题。  
+3、控制ZipList大小，提高连续内存空间申请效率  
+4、中间节点可以压缩，进一步节省内存  
+
+### SkipList   
+SkpiList(跳表)首先是链表，但与传统链表相比有几样差异：  
+1、元素按照升序排序存储。   
+2、节点可能包含多个指针，指针跨度不同(最多允许32级指针，意味着最多可以存储2^32个节点元素)  
+
+![img/img_33.png](img/img_33.png)  
+
+![img/img_34.png](img/img_34.png)  
+
+！
+
+[可以通过连接直接转到SkipList和SkipListNode结构源码](src/server.h)
+
+以下SkipList是内存结构图：  
+![img/img_35.png](img/img_35.png)
+
+---
+SkipList的特点：   
+1、跳跃表是一个双向链表，每个节点都包含score和ele值  
+2、节点按照score值排序，score值一样则按照ele字典排序   
+3、每个节点都可以包含多层指针，层数是1到32之间的随机数  
+4、不同指针到下一个节点的跨度不同，层级越高，跨度越大  
+5、增删改查效率与红黑树基本一致，实现却更简单   
+
+---
+### RedisObject  
+Redis中的任意数据类型的键和值都会封装为一个RedisObject，也叫redis对象，源码如下：   
+![img/img_36.png](img/img_36.png)  
+
+Redis中会根据存储的数据类型不同，选择不同的编码方式，共包含11种不同类型：  
+![img.png](img.png)
+
+Redis中会根据存储的数据类型不同，选择不同的编码方式。每种数据类型的使用的编码方式如何：    
+
+![img/img_37.png](img/img_37.png)

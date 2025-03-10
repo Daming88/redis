@@ -199,6 +199,7 @@ void listTypeConvert(robj *subject, int enc) {
 void pushGenericCommand(client *c, int where) {
     int j, pushed = 0;
 
+    // 判断元素长度不能超过LIST_MAX_ITEM_SIZE
     for (j = 2; j < c->argc; j++) {
         if (sdslen(c->argv[j]->ptr) > LIST_MAX_ITEM_SIZE) {
             addReplyError(c, "Element too large");
@@ -206,18 +207,23 @@ void pushGenericCommand(client *c, int where) {
         }
     }
 
+    // 尝试找到key对应的list
     robj *lobj = lookupKeyWrite(c->db,c->argv[1]);
 
+    // 检查类型是否正确
     if (lobj && lobj->type != OBJ_LIST) {
         addReply(c,shared.wrongtypeerr);
         return;
     }
 
     for (j = 2; j < c->argc; j++) {
+        // 检查list是否为空
         if (!lobj) {
+            // 如果为空，则创建一个新的QuickList
             lobj = createQuicklistObject();
             quicklistSetOptions(lobj->ptr, server.list_max_ziplist_size,
                                 server.list_compress_depth);
+            // 把元素添加到list中
             dbAdd(c->db,c->argv[1],lobj);
         }
         listTypePush(lobj,c->argv[j],where);

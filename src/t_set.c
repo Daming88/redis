@@ -51,6 +51,7 @@ robj *setTypeCreate(sds value) {
  * returned, otherwise the new element is added and 1 is returned. */
 int setTypeAdd(robj *subject, sds value) {
     long long llval;
+    // 已经是HT编码，直接添加元素
     if (subject->encoding == OBJ_ENCODING_HT) {
         dict *ht = subject->ptr;
         dictEntry *de = dictAddRaw(ht,value,NULL);
@@ -59,13 +60,15 @@ int setTypeAdd(robj *subject, sds value) {
             dictSetVal(ht,de,NULL);
             return 1;
         }
-    } else if (subject->encoding == OBJ_ENCODING_INTSET) {
+    } else if (subject->encoding == OBJ_ENCODING_INTSET) { // 目前是INTSET
+        // 判断value是否整数
         if (isSdsRepresentableAsLongLong(value,&llval) == C_OK) {
-            uint8_t success = 0;
+            uint8_t success = 0; // 是整数，直接添加元素到Set
             subject->ptr = intsetAdd(subject->ptr,llval,&success);
             if (success) {
                 /* Convert to regular set when the intset contains
                  * too many entries. */
+                // 当intset元素数量超出set_max_intset_entries,则转为HT
                 size_t max_entries = server.set_max_intset_entries;
                 /* limit to 1G entries due to intset internals. */
                 if (max_entries >= 1<<30) max_entries = 1<<30;
@@ -73,7 +76,7 @@ int setTypeAdd(robj *subject, sds value) {
                     setTypeConvert(subject,OBJ_ENCODING_HT);
                 return 1;
             }
-        } else {
+        } else { // 不是整数，直接转成HT
             /* Failed to get integer from object, convert to regular set. */
             setTypeConvert(subject,OBJ_ENCODING_HT);
 
