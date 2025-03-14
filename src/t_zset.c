@@ -1608,7 +1608,9 @@ void zaddGenericCommand(client *c, int flags) {
     }
 
     /* Lookup the key and create the sorted set if does not exist. */
+    // zadd添加元素时，现根据key找zset，不存在则创建新的zset
     zobj = lookupKeyWrite(c->db,key);
+    // 判断是否存在
     if (zobj == NULL) {
         if (xx) goto reply_to_client; /* No key + XX option: nothing to do. */
         if (server.zset_max_ziplist_entries == 0 ||
